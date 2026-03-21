@@ -1,0 +1,30 @@
+# Dependencias
+node_modules/
+backend/node_modules/
+frontend/node_modules/
+
+# Variables de entorno — NUNCA subir al repo
+backend/.env
+.env
+
+# Build del frontend
+frontend/dist/
+
+# Uploads locales
+backend/uploads/
+
+# Docker volumes
+sqlserver_data/
+postgres_data/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/settings.json
+.idea/
