@@ -10,7 +10,7 @@ export default function InventarioPage() {
   const [showForm, setShowForm] = useState(false);
   const [editTarget, setEditTarget] = useState(null);
   const [estadoTarget, setEstadoTarget] = useState(null);
-  const [dañosTarget, setDañosTarget] = useState(null);
+  const [danosTarget, setDanosTarget] = useState(null);
 
   const fetchPrendas = useCallback(async () => {
     setLoading(true); setError('');
@@ -55,7 +55,7 @@ export default function InventarioPage() {
         className="flex-1 text-xs font-medium text-orange-600 hover:text-orange-800 hover:bg-orange-50 py-1.5 rounded-lg transition-colors">
         Estado
       </button>
-      <button onClick={() => setDañosTarget(p)}
+      <button onClick={() => setDanosTarget(p)}
         className="flex-1 text-xs font-medium text-red-500 hover:text-red-700 hover:bg-red-50 py-1.5 rounded-lg transition-colors">
         Daños
       </button>
@@ -68,7 +68,6 @@ export default function InventarioPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">Inventario</h1>
@@ -80,7 +79,6 @@ export default function InventarioPage() {
         </button>
       </div>
 
-      {/* Buscador */}
       <div className="bg-white rounded-xl shadow-sm p-4">
         <input value={busqueda} onChange={e => setBusqueda(e.target.value)}
           placeholder="🔍  Buscar por tipo, talla, color o ID..."
@@ -93,39 +91,27 @@ export default function InventarioPage() {
         <div className="bg-white rounded-xl shadow-sm p-12 text-center text-gray-400">Cargando...</div>
       ) : (
         <>
-          {/* EN MANTENIMIENTO */}
           {mantenimiento.length > 0 && (
             <Section titulo="En Mantenimiento" count={mantenimiento.length} color="orange" icono="🔧">
               <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 p-4">
-                {mantenimiento.map(p => (
-                  <TarjetaPrenda key={p.id} prenda={p} acciones={acciones(p)} />
-                ))}
+                {mantenimiento.map(p => <TarjetaPrenda key={p.id} prenda={p} acciones={acciones(p)} />)}
               </div>
             </Section>
           )}
-
-          {/* DISPONIBLES */}
           {disponibles.length > 0 && (
             <Section titulo="Disponibles" count={disponibles.length} color="green" icono="✅">
               <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 p-4">
-                {disponibles.map(p => (
-                  <TarjetaPrenda key={p.id} prenda={p} acciones={acciones(p)} />
-                ))}
+                {disponibles.map(p => <TarjetaPrenda key={p.id} prenda={p} acciones={acciones(p)} />)}
               </div>
             </Section>
           )}
-
-          {/* ALQUILADAS */}
           {alquiladas.length > 0 && (
             <Section titulo="Alquiladas" count={alquiladas.length} color="blue" icono="📋" colapsable>
               <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 p-4">
-                {alquiladas.map(p => (
-                  <TarjetaPrenda key={p.id} prenda={p} acciones={acciones(p)} />
-                ))}
+                {alquiladas.map(p => <TarjetaPrenda key={p.id} prenda={p} acciones={acciones(p)} />)}
               </div>
             </Section>
           )}
-
           {prendas.length === 0 && (
             <div className="bg-white rounded-xl shadow-sm p-12 text-center">
               <div className="text-4xl mb-3">👗</div>
@@ -137,27 +123,20 @@ export default function InventarioPage() {
 
       {showForm && <PrendaFormModal prenda={editTarget} onClose={() => setShowForm(false)} onSaved={() => { setShowForm(false); fetchPrendas(); }} />}
       {estadoTarget && <CambiarEstadoModal prenda={estadoTarget} onClose={() => setEstadoTarget(null)} onSaved={() => { setEstadoTarget(null); fetchPrendas(); }} />}
-      {dañosTarget && <DañosModal prenda={dañosTarget} onClose={() => { setDañosTarget(null); fetchPrendas(); }} />}
+      {danosTarget && <DanosModal prenda={danosTarget} onClose={() => { setDanosTarget(null); fetchPrendas(); }} />}
     </div>
   );
 }
 
 function Section({ titulo, count, color, icono, children, colapsable = false }) {
   const [abierto, setAbierto] = useState(true);
-  const colors = {
-    green:  'border-green-200 bg-green-50',
-    blue:   'border-blue-200 bg-blue-50',
-    orange: 'border-orange-200 bg-orange-50',
-  };
-  const textColors  = { green: 'text-green-700',  blue: 'text-blue-700',  orange: 'text-orange-700' };
+  const colors = { green: 'border-green-200 bg-green-50', blue: 'border-blue-200 bg-blue-50', orange: 'border-orange-200 bg-orange-50' };
+  const textColors = { green: 'text-green-700', blue: 'text-blue-700', orange: 'text-orange-700' };
   const badgeColors = { green: 'bg-green-200 text-green-800', blue: 'bg-blue-200 text-blue-800', orange: 'bg-orange-200 text-orange-800' };
-
   return (
     <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
-      <div
-        className={`flex items-center justify-between px-5 py-3 border-b ${colors[color]} ${colapsable ? 'cursor-pointer select-none' : ''}`}
-        onClick={colapsable ? () => setAbierto(v => !v) : undefined}
-      >
+      <div className={`flex items-center justify-between px-5 py-3 border-b ${colors[color]} ${colapsable ? 'cursor-pointer select-none' : ''}`}
+        onClick={colapsable ? () => setAbierto(v => !v) : undefined}>
         <div className="flex items-center gap-2">
           <span className="text-lg">{icono}</span>
           <span className={`font-semibold text-sm ${textColors[color]}`}>{titulo}</span>
@@ -171,23 +150,12 @@ function Section({ titulo, count, color, icono, children, colapsable = false }) 
 }
 
 function TarjetaPrenda({ prenda: p, acciones }) {
-  const estadoColor = {
-    Disponible:       'bg-green-100 text-green-700',
-    Alquilada:        'bg-blue-100 text-blue-700',
-    En_Mantenimiento: 'bg-orange-100 text-orange-700',
-  };
-
+  const estadoColor = { Disponible: 'bg-green-100 text-green-700', Alquilada: 'bg-blue-100 text-blue-700', En_Mantenimiento: 'bg-orange-100 text-orange-700' };
   return (
     <div className="border border-gray-100 rounded-xl bg-white shadow-sm overflow-hidden flex flex-col">
-      {/* Foto */}
       <div className="h-32 bg-gray-100 flex items-center justify-center overflow-hidden">
-        {p.foto_url ? (
-          <img src={p.foto_url} alt={p.tipo} className="w-full h-full object-cover" />
-        ) : (
-          <span className="text-4xl">👗</span>
-        )}
+        {p.foto_url ? <img src={p.foto_url} alt={p.tipo} className="w-full h-full object-cover" /> : <span className="text-4xl">👗</span>}
       </div>
-      {/* Info */}
       <div className="p-3 flex flex-col gap-1 flex-1">
         <div className="flex items-start justify-between gap-1">
           <p className="font-semibold text-gray-800 text-sm leading-tight">{p.tipo}</p>
@@ -240,7 +208,7 @@ function PrendaFormModal({ prenda, onClose, onSaved }) {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
-          <input name="tipo" type="text" value={form.tipo} onChange={e => setForm(p => ({ ...p, tipo: e.target.value }))} required
+          <input type="text" value={form.tipo} onChange={e => setForm(p => ({ ...p, tipo: e.target.value }))} required
             className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
         </div>
         <div>
@@ -253,12 +221,12 @@ function PrendaFormModal({ prenda, onClose, onSaved }) {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Color</label>
-          <input name="color" type="text" value={form.color} onChange={e => setForm(p => ({ ...p, color: e.target.value }))} required
+          <input type="text" value={form.color} onChange={e => setForm(p => ({ ...p, color: e.target.value }))} required
             className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Precio por Día</label>
-          <input name="precio_por_dia" type="number" value={form.precio_por_dia} onChange={e => setForm(p => ({ ...p, precio_por_dia: e.target.value }))} required min="0.01" step="0.01"
+          <input type="number" value={form.precio_por_dia} onChange={e => setForm(p => ({ ...p, precio_por_dia: e.target.value }))} required min="0.01" step="0.01"
             className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
         </div>
         <ImageUpload value={form.foto_url} onChange={url => setForm(p => ({ ...p, foto_url: url }))} label="Foto de la prenda" />
@@ -294,7 +262,8 @@ function CambiarEstadoModal({ prenda, onClose, onSaved }) {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Nuevo Estado</label>
-          <select value={nuevoEstado} onChange={e => setNuevoEstado(e.target.value)} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
+          <select value={nuevoEstado} onChange={e => setNuevoEstado(e.target.value)}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
             {['Disponible', 'En_Mantenimiento'].map(e => <option key={e} value={e}>{e}</option>)}
           </select>
         </div>
@@ -310,28 +279,29 @@ function CambiarEstadoModal({ prenda, onClose, onSaved }) {
   );
 }
 
-function DañosModal({ prenda, onClose }) {
-  const [daños, setDaños] = useState([]);
+function DanosModal({ prenda, onClose }) {
+  const [danos, setDanos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ descripcion: '', foto_url: '', costo_dano: '' });
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+  const [danoDetalle, setDanoDetalle] = useState(null);
 
-  const fetchDaños = async () => {
+  const fetchDanos = async () => {
     setLoading(true);
     try {
       const { data } = await apiClient.get(`/prendas/${prenda.id}/danos`);
-      setDaños(data);
+      setDanos(data);
     } catch {} finally { setLoading(false); }
   };
 
-  useEffect(() => { fetchDaños(); }, []);
+  useEffect(() => { fetchDanos(); }, []);
 
   const handleResolver = async (danoId) => {
     try {
       await apiClient.patch(`/prendas/${prenda.id}/danos/${danoId}/resolver`);
-      fetchDaños();
+      fetchDanos();
     } catch (err) { alert(err.response?.data?.message || 'Error.'); }
   };
 
@@ -343,7 +313,7 @@ function DañosModal({ prenda, onClose }) {
       await apiClient.post(`/prendas/${prenda.id}/danos`, form);
       setForm({ descripcion: '', foto_url: '', costo_dano: '' });
       setShowForm(false);
-      fetchDaños();
+      fetchDanos();
     } catch (err) { setError(err.response?.data?.message || 'Error al registrar.'); }
     finally { setSaving(false); }
   };
@@ -361,16 +331,17 @@ function DañosModal({ prenda, onClose }) {
         <div className="flex-1 overflow-y-auto px-6 py-4 space-y-3">
           {loading ? (
             <p className="text-center text-gray-400 py-6">Cargando...</p>
-          ) : daños.length === 0 ? (
+          ) : danos.length === 0 ? (
             <p className="text-center text-gray-400 py-6">Sin daños registrados.</p>
-          ) : daños.map(d => (
-            <div key={d.id} className={`border rounded-lg p-3 ${d.resuelto ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'}`}>
+          ) : danos.map(d => (
+            <div key={d.id} onClick={() => setDanoDetalle(d)}
+              className={`border rounded-lg p-3 cursor-pointer hover:shadow-md transition-shadow ${d.resuelto ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'}`}>
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1">
                   <p className="text-sm text-gray-800">{d.descripcion}</p>
-                  {d.foto_url && <a href={d.foto_url} target="_blank" rel="noreferrer" className="text-xs text-indigo-600 hover:underline mt-1 inline-block">Ver foto</a>}
+                  {d.foto_url && <p className="text-xs text-indigo-500 mt-1">📷 Tiene foto</p>}
                   <p className="text-xs text-gray-400 mt-1">
-                    {d.alquiler_id ? `Alquiler #${d.alquiler_id} · ` : ''}{new Date(d.created_at).toLocaleDateString()}
+                    {d.alquiler_id ? `Alquiler #${d.alquiler_id} · ` : ''}{new Date(d.created_at).toLocaleDateString('es-CO')}
                     {d.costo_dano ? ` · $${Number(d.costo_dano).toLocaleString('es-CO')}` : ''}
                   </p>
                 </div>
@@ -379,7 +350,8 @@ function DañosModal({ prenda, onClose }) {
                     {d.resuelto ? 'Resuelto' : 'Pendiente'}
                   </span>
                   {!d.resuelto && (
-                    <button onClick={() => handleResolver(d.id)} className="text-xs text-green-600 hover:text-green-800 font-medium">Marcar resuelto</button>
+                    <button onClick={e => { e.stopPropagation(); handleResolver(d.id); }}
+                      className="text-xs text-green-600 hover:text-green-800 font-medium">Marcar resuelto</button>
                   )}
                 </div>
               </div>
@@ -415,6 +387,54 @@ function DañosModal({ prenda, onClose }) {
           )}
         </div>
       </div>
+
+      {/* Modal detalle daño */}
+      {danoDetalle && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[60] p-4" onClick={() => setDanoDetalle(null)}>
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-6 py-4 border-b">
+              <h3 className="text-base font-semibold text-gray-800">Detalle del daño</h3>
+              <button onClick={() => setDanoDetalle(null)} className="text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+            </div>
+            <div className="px-6 py-4 space-y-4">
+              {danoDetalle.foto_url && (
+                <img src={danoDetalle.foto_url} alt="Foto del daño"
+                  className="w-full max-h-64 object-contain rounded-lg border border-gray-200" />
+              )}
+              <div className="space-y-3">
+                <div>
+                  <p className="text-xs text-gray-400 uppercase tracking-wide">Descripción</p>
+                  <p className="text-sm text-gray-800 mt-0.5">{danoDetalle.descripcion}</p>
+                </div>
+                <div className="flex gap-6 flex-wrap">
+                  <div>
+                    <p className="text-xs text-gray-400 uppercase tracking-wide">Estado</p>
+                    <span className={`inline-block mt-0.5 text-xs font-semibold px-2 py-0.5 rounded-full ${danoDetalle.resuelto ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                      {danoDetalle.resuelto ? 'Resuelto' : 'Pendiente'}
+                    </span>
+                  </div>
+                  {danoDetalle.costo_dano && (
+                    <div>
+                      <p className="text-xs text-gray-400 uppercase tracking-wide">Costo</p>
+                      <p className="text-sm text-gray-800 mt-0.5">${Number(danoDetalle.costo_dano).toLocaleString('es-CO')}</p>
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-xs text-gray-400 uppercase tracking-wide">Fecha</p>
+                    <p className="text-sm text-gray-800 mt-0.5">{new Date(danoDetalle.created_at).toLocaleDateString('es-CO')}</p>
+                  </div>
+                  {danoDetalle.alquiler_id && (
+                    <div>
+                      <p className="text-xs text-gray-400 uppercase tracking-wide">Alquiler</p>
+                      <p className="text-sm text-gray-800 mt-0.5">#{danoDetalle.alquiler_id}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
