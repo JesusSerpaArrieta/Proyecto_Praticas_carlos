@@ -341,7 +341,7 @@ function DanosModal({ prenda, onClose }) {
                   <p className="text-sm text-gray-800">{d.descripcion}</p>
                   {d.foto_url && <p className="text-xs text-indigo-500 mt-1">📷 Tiene foto</p>}
                   <p className="text-xs text-gray-400 mt-1">
-                    {d.alquiler_id ? `Alquiler #${d.alquiler_id} · ` : ''}{new Date(d.created_at).toLocaleDateString('es-CO')}
+                    {d.alquiler_id ? `Alquiler #${d.alquiler_id} · ` : ''}{new Date(d.createdAt).toLocaleDateString('es-CO')}
                     {d.costo_dano ? ` · $${Number(d.costo_dano).toLocaleString('es-CO')}` : ''}
                   </p>
                 </div>
@@ -421,7 +421,7 @@ function DanosModal({ prenda, onClose }) {
                   )}
                   <div>
                     <p className="text-xs text-gray-400 uppercase tracking-wide">Fecha</p>
-                    <p className="text-sm text-gray-800 mt-0.5">{new Date(danoDetalle.created_at).toLocaleDateString('es-CO')}</p>
+                    <p className="text-sm text-gray-800 mt-0.5">{new Date(danoDetalle.createdAt).toLocaleDateString('es-CO')}</p>
                   </div>
                   {danoDetalle.alquiler_id && (
                     <div>
