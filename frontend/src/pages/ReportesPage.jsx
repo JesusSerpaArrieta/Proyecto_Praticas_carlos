@@ -42,7 +42,7 @@ function renderRow(tipo, row, idx) {
               {row.resuelto ? 'Resuelto' : 'Pendiente'}
             </span>
           </td>
-          <td className="px-4 py-3 text-gray-500">{new Date(row.created_at).toLocaleDateString()}</td>
+          <td className="px-4 py-3 text-gray-500">{new Date(row.createdAt).toLocaleDateString()}</td>
         </tr>
       );
     default: return null;
