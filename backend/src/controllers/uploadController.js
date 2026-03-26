@@ -1,13 +1,15 @@
-const { upload } = require('../services/uploadService');
+const { upload, subirACloudinary } = require('../services/uploadService');
 
-function subirImagen(req, res) {
-  upload.single('imagen')(req, res, (err) => {
+async function subirImagen(req, res) {
+  upload.single('imagen')(req, res, async (err) => {
     if (err) return res.status(422).json({ error: true, message: err.message });
     if (!req.file) return res.status(400).json({ error: true, message: 'No se recibió ningún archivo.' });
-    // En producción (BACKEND_URL definida), devolver URL absoluta
-    const base = process.env.BACKEND_URL ? process.env.BACKEND_URL : '';
-    const url = `${base}/uploads/${req.file.filename}`;
-    res.json({ url });
+    try {
+      const url = await subirACloudinary(req.file.buffer);
+      res.json({ url });
+    } catch (e) {
+      res.status(500).json({ error: true, message: 'Error al subir imagen a Cloudinary.' });
+    }
   });
 }
 
