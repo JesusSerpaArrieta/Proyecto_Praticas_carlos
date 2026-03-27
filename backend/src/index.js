@@ -21,6 +21,17 @@ app.use('/uploads', express.static(uploadsDir));
 
 app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
 
+// Endpoint temporal para probar notificaciones
+app.get('/api/test-notificaciones', async (_req, res) => {
+  try {
+    const { enviarRecordatoriosDiarios } = require('./services/notificacionService');
+    await enviarRecordatoriosDiarios();
+    res.json({ status: 'ok', message: 'Recordatorios enviados. Revisa los logs.' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 const authMiddleware = require('./middlewares/authMiddleware');
 app.post('/api/uploads', authMiddleware, require('./controllers/uploadController').subirImagen);
 
