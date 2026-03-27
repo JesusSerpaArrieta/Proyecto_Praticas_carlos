@@ -21,17 +21,6 @@ app.use('/uploads', express.static(uploadsDir));
 
 app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
 
-// Endpoint temporal para probar notificaciones
-app.get('/api/test-notificaciones', async (_req, res) => {
-  try {
-    const { enviarRecordatoriosDiarios } = require('./services/notificacionService');
-    await enviarRecordatoriosDiarios();
-    res.json({ status: 'ok', message: 'Recordatorios enviados. Revisa los logs.' });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
 const authMiddleware = require('./middlewares/authMiddleware');
 app.post('/api/uploads', authMiddleware, require('./controllers/uploadController').subirImagen);
 
@@ -108,15 +97,8 @@ async function startWithRetry(retries = 10, delayMs = 5000) {
       app.listen(PORT, () => {
         console.log(`Servidor corriendo en puerto ${PORT}`);
         const { marcarVencidos } = require('./services/alquilerService');
-        const { enviarRecordatoriosDiarios } = require('./services/notificacionService');
         marcarVencidos().catch(console.error);
-        // Cron cada hora: marcar vencidos + enviar recordatorios
-        setInterval(() => {
-          marcarVencidos().catch(console.error);
-          enviarRecordatoriosDiarios().catch(console.error);
-        }, 60 * 60 * 1000);
-        // Enviar recordatorios al arrancar también
-        enviarRecordatoriosDiarios().catch(console.error);
+        setInterval(() => marcarVencidos().catch(console.error), 60 * 60 * 1000);
       });
       return;
     } catch (err) {
