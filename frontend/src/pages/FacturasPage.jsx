@@ -12,6 +12,7 @@ export default function FacturasPage() {
   const [facturas, setFacturas] = useState([]);
   const [loading, setLoading] = useState(false);
   const [q, setQ] = useState('');
+  const [confirmPago, setConfirmPago] = useState(null);
 
   const fetchFacturas = useCallback(async () => {
     setLoading(true);
@@ -23,8 +24,6 @@ export default function FacturasPage() {
 
   useEffect(() => { fetchFacturas(); }, [fetchFacturas]);
 
-  const [confirmPago, setConfirmPago] = useState(null);
-
   const togglePago = async (f) => {
     const nuevoEstado = f.estado_pago === 'Pagado' ? 'Pendiente' : 'Pagado';
     try {
@@ -34,7 +33,8 @@ export default function FacturasPage() {
     } catch { alert('Error al actualizar estado de pago.'); }
   };
 
-  const handlePDF = (f) => {    const token = localStorage.getItem('token');
+  const handlePDF = (f) => {
+    const token = localStorage.getItem('token');
     fetch(`${apiClient.defaults.baseURL}/facturas/${f.id}/pdf`, {
       headers: { Authorization: `Bearer ${token}` },
     })
@@ -62,12 +62,9 @@ export default function FacturasPage() {
       </div>
 
       <div className="bg-white rounded-xl shadow-sm p-4">
-        <input
-          value={q}
-          onChange={e => setQ(e.target.value)}
+        <input value={q} onChange={e => setQ(e.target.value)}
           placeholder="🔍  Buscar por número o cliente..."
-          className="w-full max-w-sm border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
-        />
+          className="w-full max-w-sm border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
       </div>
 
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
@@ -96,9 +93,7 @@ export default function FacturasPage() {
                           #{f.numero_factura}
                         </span>
                         {nueva && (
-                          <span className="bg-indigo-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full leading-none">
-                            NEW
-                          </span>
+                          <span className="bg-indigo-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full leading-none">NEW</span>
                         )}
                       </div>
                       <p className="text-xs text-gray-400 mt-0.5">
@@ -113,34 +108,26 @@ export default function FacturasPage() {
                       {f.alquiler?.prenda?.tipo || '—'}
                       <p className="text-xs text-gray-400">{f.alquiler?.prenda?.talla} · {f.alquiler?.prenda?.color}</p>
                     </td>
-                    <td className="px-4 py-3 text-gray-600 text-xs">
-                      {f.alquiler?.fecha_alquiler || '—'}
-                    </td>
-                    <td className="px-4 py-3 text-gray-600 text-xs">
-                      {f.alquiler?.fecha_devolucion || '—'}
-                    </td>
+                    <td className="px-4 py-3 text-gray-600 text-xs">{f.alquiler?.fecha_alquiler || '—'}</td>
+                    <td className="px-4 py-3 text-gray-600 text-xs">{f.alquiler?.fecha_devolucion || '—'}</td>
                     <td className="px-4 py-3">
                       <span className={`font-bold text-sm ${nueva ? 'text-indigo-700' : 'text-gray-800'}`}>
                         ${Number(f.alquiler?.precio_total || 0).toLocaleString('es-CO')}
                       </span>
                     </td>
                     <td className="px-4 py-3">
-                      <button
-                        onClick={() => setConfirmPago(f)}
+                      <button onClick={() => setConfirmPago(f)}
                         className={`text-xs font-semibold px-2.5 py-1.5 rounded-lg border transition-colors ${
                           pagada
                             ? 'bg-green-100 text-green-700 border-green-200 hover:bg-green-200'
                             : 'bg-yellow-50 text-yellow-700 border-yellow-200 hover:bg-yellow-100'
-                        }`}
-                      >
+                        }`}>
                         {pagada ? '✓ Pagado' : '⏳ Pendiente'}
                       </button>
                     </td>
                     <td className="px-4 py-3">
-                      <button
-                        onClick={() => handlePDF(f)}
-                        className="inline-flex items-center gap-1 text-xs font-semibold text-red-600 hover:text-red-800 border border-red-200 hover:border-red-400 bg-white hover:bg-red-50 px-2.5 py-1.5 rounded-lg transition-colors"
-                      >
+                      <button onClick={() => handlePDF(f)}
+                        className="inline-flex items-center gap-1 text-xs font-semibold text-red-600 hover:text-red-800 border border-red-200 hover:border-red-400 bg-white hover:bg-red-50 px-2.5 py-1.5 rounded-lg transition-colors">
                         📄 PDF
                       </button>
                     </td>
@@ -151,11 +138,7 @@ export default function FacturasPage() {
           </table>
         )}
       </div>
-    </div>
-  );
-}
 
-      {/* Confirmación cambio estado pago */}
       {confirmPago && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
@@ -165,8 +148,7 @@ export default function FacturasPage() {
                 {confirmPago.estado_pago === 'Pagado' ? 'Marcar como Pendiente' : 'Marcar como Pagado'}
               </h3>
               <p className="text-sm text-gray-500 mt-1">
-                Factura <span className="font-semibold">#{confirmPago.numero_factura}</span> —{' '}
-                {confirmPago.alquiler?.cliente?.nombre_completo}
+                Factura <span className="font-semibold">#{confirmPago.numero_factura}</span> — {confirmPago.alquiler?.cliente?.nombre_completo}
               </p>
             </div>
             <div className="flex gap-3">
