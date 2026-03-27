@@ -205,19 +205,30 @@ function AlertaTable({ titulo, icono, badgeColor, rows, empty, onVerTodos }) {
           <div className="space-y-2">
             {rows.slice(0, 4).map(a => {
               const dias = Math.ceil((new Date(a.fecha_devolucion) - new Date()) / (1000 * 60 * 60 * 24));
+              const telefono = a.cliente?.telefono?.replace(/\D/g, '');
+              const waLink = telefono
+                ? `https://wa.me/57${telefono}?text=${encodeURIComponent(`Hola ${a.cliente?.nombre_completo}, le recordamos que debe devolver la prenda "${a.prenda?.tipo}" (talla ${a.prenda?.talla}) el día ${a.fecha_devolucion}. Gracias - Las Togas`)}`
+                : null;
               return (
-                <div key={a.id} className="flex items-center justify-between py-2 border-b last:border-0">
-                  <div>
-                    <p className="text-sm font-medium text-gray-800">{a.cliente?.nombre_completo}</p>
+                <div key={a.id} className="flex items-center justify-between py-2 border-b last:border-0 gap-2">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-800 truncate">{a.cliente?.nombre_completo}</p>
                     <p className="text-xs text-gray-400">{a.prenda?.tipo} · {a.prenda?.talla}</p>
                   </div>
-                  <div className="text-right">
+                  <div className="text-right shrink-0">
                     <p className="text-xs text-gray-500">{a.fecha_devolucion}</p>
                     {dias < 0
                       ? <span className="text-xs font-semibold text-red-600">{Math.abs(dias)}d vencido</span>
                       : <span className="text-xs font-semibold text-yellow-600">{dias}d restantes</span>
                     }
                   </div>
+                  {waLink && (
+                    <a href={waLink} target="_blank" rel="noreferrer"
+                      className="shrink-0 flex items-center gap-1 text-xs font-semibold text-white bg-green-500 hover:bg-green-600 px-2.5 py-1.5 rounded-lg transition-colors">
+                      <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-current"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.118 1.528 5.855L0 24l6.335-1.508A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.006-1.371l-.36-.214-3.732.888.936-3.618-.235-.372A9.818 9.818 0 1112 21.818z"/></svg>
+                      WhatsApp
+                    </a>
+                  )}
                 </div>
               );
             })}
