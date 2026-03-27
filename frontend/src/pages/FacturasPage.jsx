@@ -23,11 +23,14 @@ export default function FacturasPage() {
 
   useEffect(() => { fetchFacturas(); }, [fetchFacturas]);
 
+  const [confirmPago, setConfirmPago] = useState(null);
+
   const togglePago = async (f) => {
     const nuevoEstado = f.estado_pago === 'Pagado' ? 'Pendiente' : 'Pagado';
     try {
       await apiClient.patch(`/facturas/${f.id}/estado-pago`, { estado_pago: nuevoEstado });
       setFacturas(prev => prev.map(x => x.id === f.id ? { ...x, estado_pago: nuevoEstado } : x));
+      setConfirmPago(null);
     } catch { alert('Error al actualizar estado de pago.'); }
   };
 
@@ -123,7 +126,7 @@ export default function FacturasPage() {
                     </td>
                     <td className="px-4 py-3">
                       <button
-                        onClick={() => togglePago(f)}
+                        onClick={() => setConfirmPago(f)}
                         className={`text-xs font-semibold px-2.5 py-1.5 rounded-lg border transition-colors ${
                           pagada
                             ? 'bg-green-100 text-green-700 border-green-200 hover:bg-green-200'
@@ -148,6 +151,37 @@ export default function FacturasPage() {
           </table>
         )}
       </div>
+    </div>
+  );
+}
+
+      {/* Confirmación cambio estado pago */}
+      {confirmPago && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
+            <div className="text-center">
+              <div className="text-3xl mb-2">{confirmPago.estado_pago === 'Pagado' ? '↩️' : '✅'}</div>
+              <h3 className="text-base font-semibold text-gray-800">
+                {confirmPago.estado_pago === 'Pagado' ? 'Marcar como Pendiente' : 'Marcar como Pagado'}
+              </h3>
+              <p className="text-sm text-gray-500 mt-1">
+                Factura <span className="font-semibold">#{confirmPago.numero_factura}</span> —{' '}
+                {confirmPago.alquiler?.cliente?.nombre_completo}
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <button onClick={() => setConfirmPago(null)}
+                className="flex-1 px-4 py-2 text-sm font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50">
+                Cancelar
+              </button>
+              <button onClick={() => togglePago(confirmPago)}
+                className="flex-1 px-4 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg">
+                Confirmar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -12,6 +12,8 @@ export default function InventarioPage() {
   const [estadoTarget, setEstadoTarget] = useState(null);
   const [danosTarget, setDanosTarget] = useState(null);
 
+  const [eliminarTarget, setEliminarTarget] = useState(null);
+
   const fetchPrendas = useCallback(async () => {
     setLoading(true); setError('');
     try {
@@ -23,11 +25,15 @@ export default function InventarioPage() {
 
   useEffect(() => { fetchPrendas(); }, [fetchPrendas]);
 
-  const handleEliminar = (p) => {
-    if (!window.confirm(`¿Eliminar la prenda #${p.id} (${p.tipo})?`)) return;
-    apiClient.delete(`/prendas/${p.id}`)
-      .then(fetchPrendas)
-      .catch(err => alert(err.response?.data?.error || 'Error al eliminar.'));
+  const handleEliminar = async () => {
+    try {
+      await apiClient.delete(`/prendas/${eliminarTarget.id}`);
+      setEliminarTarget(null);
+      fetchPrendas();
+    } catch (err) {
+      alert(err.response?.data?.error || 'Error al eliminar.');
+      setEliminarTarget(null);
+    }
   };
 
   const filtrar = (lista) => {
@@ -59,7 +65,7 @@ export default function InventarioPage() {
         className="flex-1 text-xs font-medium text-red-500 hover:text-red-700 hover:bg-red-50 py-1.5 rounded-lg transition-colors">
         Daños
       </button>
-      <button onClick={() => handleEliminar(p)}
+      <button onClick={() => setEliminarTarget(p)}
         className="flex-1 text-xs font-medium text-gray-400 hover:text-gray-600 hover:bg-gray-50 py-1.5 rounded-lg transition-colors">
         Eliminar
       </button>
@@ -124,6 +130,30 @@ export default function InventarioPage() {
       {showForm && <PrendaFormModal prenda={editTarget} onClose={() => setShowForm(false)} onSaved={() => { setShowForm(false); fetchPrendas(); }} />}
       {estadoTarget && <CambiarEstadoModal prenda={estadoTarget} onClose={() => setEstadoTarget(null)} onSaved={() => { setEstadoTarget(null); fetchPrendas(); }} />}
       {danosTarget && <DanosModal prenda={danosTarget} onClose={() => { setDanosTarget(null); fetchPrendas(); }} />}
+
+      {eliminarTarget && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
+            <div className="text-center">
+              <div className="text-4xl mb-2">⚠️</div>
+              <h3 className="text-lg font-semibold text-gray-800">¿Eliminar prenda?</h3>
+              <p className="text-sm text-gray-500 mt-1">
+                Se eliminará <span className="font-semibold text-gray-700">#{eliminarTarget.id} — {eliminarTarget.tipo}</span> permanentemente.
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <button onClick={() => setEliminarTarget(null)}
+                className="flex-1 px-4 py-2 text-sm font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50">
+                Cancelar
+              </button>
+              <button onClick={handleEliminar}
+                className="flex-1 px-4 py-2 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 rounded-lg">
+                Sí, eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -226,7 +256,7 @@ function PrendaFormModal({ prenda, onClose, onSaved }) {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Precio por Día</label>
-          <input type="number" value={form.precio_por_dia} onChange={e => setForm(p => ({ ...p, precio_por_dia: e.target.value }))} required min="0.01" step="0.01"
+          <input type="number" value={form.precio_por_dia} onChange={e => setForm(p => ({ ...p, precio_por_dia: e.target.value }))} required min="1" step="1"
             className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
         </div>
         <ImageUpload value={form.foto_url} onChange={url => setForm(p => ({ ...p, foto_url: url }))} label="Foto de la prenda" />

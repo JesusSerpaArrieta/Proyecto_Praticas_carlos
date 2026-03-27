@@ -34,10 +34,15 @@ export default function AlquileresPage() {
 
   useEffect(() => { fetchAlquileres(); }, [fetchAlquileres]);
 
+  const [facturando, setFacturando] = useState(null);
+
   const handleFactura = (a) => {
+    if (facturando === a.id) return;
+    setFacturando(a.id);
     apiClient.post('/facturas', { alquiler_id: a.id })
       .then(() => navigate('/facturas'))
-      .catch(err => alert(err.response?.data?.message || 'Error al generar factura.'));
+      .catch(err => alert(err.response?.data?.message || 'Error al generar factura.'))
+      .finally(() => setFacturando(null));
   };
 
   const filtrar = (lista) => {
@@ -170,9 +175,9 @@ export default function AlquileresPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 p-4">
                 {sinFacturar.map(a => (
                   <TarjetaAlquiler key={a.id} alquiler={a}
-                    accion={<button onClick={() => handleFactura(a)}
-                      className="w-full bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold py-2 rounded-lg transition-colors">
-                      💳 Generar Factura
+                    accion={<button onClick={() => handleFactura(a)} disabled={facturando === a.id}
+                      className="w-full bg-amber-500 hover:bg-amber-600 disabled:bg-amber-300 text-white text-xs font-semibold py-2 rounded-lg transition-colors">
+                      {facturando === a.id ? 'Generando...' : '💳 Generar Factura'}
                     </button>}
                     badge={<span className="bg-amber-100 text-amber-700 text-xs font-bold px-2 py-0.5 rounded-full">Sin facturar</span>}
                   />
@@ -355,7 +360,9 @@ function NuevoAlquilerModal({ onClose, onSaved }) {
     e.preventDefault(); setError('');
     if (!form.cliente_id) { setError('Selecciona un cliente.'); return; }
     if (!form.prenda_id) { setError('Selecciona una prenda.'); return; }
-    if (form.fecha_devolucion <= form.fecha_alquiler) { setError('La fecha de devolución debe ser posterior a la de alquiler.'); return; }
+    if (!form.fecha_alquiler) { setError('Selecciona la fecha de alquiler.'); return; }
+    if (!form.fecha_devolucion) { setError('Selecciona la fecha de devolución.'); return; }
+    if (form.fecha_devolucion <= form.fecha_alquiler) { setError('La fecha de devolución debe ser al menos un día después de la fecha de alquiler.'); return; }
     setSaving(true);
     try { await apiClient.post('/alquileres', form); onSaved(); }
     catch (err) { setError(err.response?.data?.error || 'Error al registrar.'); }
@@ -523,7 +530,7 @@ function ExtenderModal({ alquiler, onClose, onSaved }) {
   const handleSubmit = async (e) => {
     e.preventDefault(); setError('');
     if (!nuevaFecha) { setError('Selecciona la nueva fecha de devolución.'); return; }
-    if (nuevaFecha <= alquiler.fecha_alquiler) { setError('La nueva fecha debe ser posterior a la fecha de alquiler.'); return; }
+    if (nuevaFecha <= alquiler.fecha_devolucion) { setError(`La nueva fecha debe ser posterior a la devolución actual (${alquiler.fecha_devolucion}).`); return; }
     setSaving(true);
     try {
       await apiClient.patch(`/alquileres/${alquiler.id}/extender`, { nueva_fecha_devolucion: nuevaFecha });
