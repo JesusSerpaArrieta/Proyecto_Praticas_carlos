@@ -1,9 +1,15 @@
-const { Resend } = require('resend');
+const nodemailer = require('nodemailer');
 const { Op } = require('sequelize');
 const { Alquiler, Cliente, Prenda } = require('../models/index');
 const { normalizeResult } = require('../utils/normalizeResult');
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_APP_PASSWORD,
+  },
+});
 
 // Obtener alquileres que vencen en exactamente N días
 async function obtenerProximosAVencer(dias = 3) {
@@ -25,8 +31,8 @@ async function enviarEmailRecordatorio(alquiler) {
     (new Date(alquiler.fecha_devolucion) - new Date()) / (1000 * 60 * 60 * 24)
   );
 
-  const { error } = await resend.emails.send({
-    from: process.env.RESEND_FROM || 'Las Togas <notificaciones@lastogas.com>',
+  await transporter.sendMail({
+    from: `"Las Togas" <${process.env.GMAIL_USER}>`,
     to: cliente.email,
     subject: `Recordatorio: devolución de toga en ${dias} día${dias !== 1 ? 's' : ''}`,
     html: `
@@ -44,13 +50,12 @@ async function enviarEmailRecordatorio(alquiler) {
     `,
   });
 
-  if (error) throw error;
   return { sent: true, to: cliente.email };
 }
 
 // Cron: enviar recordatorios para alquileres que vencen en 1, 2 y 3 días
 async function enviarRecordatoriosDiarios() {
-  if (!process.env.RESEND_API_KEY) return;
+  if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) return;
   for (const dias of [1, 2, 3]) {
     const alquileres = await obtenerProximosAVencer(dias);
     for (const a of alquileres) {
